@@ -1,0 +1,315 @@
+<UserControl x:Class="MCGCadPlugin.Views.DetailDesign.DetailDesignView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MCGCadPlugin.Views.DetailDesign.ViewModels"
+             xmlns:ctrl="clr-namespace:MCGCadPlugin.Views.DetailDesign.Controls"
+             Background="#FF3C3C3C">
+
+    <UserControl.DataContext>
+        <vm:DetailDesignViewModel />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <!-- Theme match AutoCAD Ctrl+1 Properties (Dark) -->
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FF464646"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#FF0078D4"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#FF5A5A5A"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFE0E0E0"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#FFA0A0A0"/>
+
+        <Style x:Key="DarkButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="DarkLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Input mode -->
+            <RowDefinition Height="Auto"/>  <!-- Select panel -->
+            <RowDefinition Height="Auto"/>  <!-- Panel info -->
+            <RowDefinition Height="Auto"/>  <!-- Parameters -->
+            <RowDefinition Height="Auto"/>  <!-- Separator -->
+            <RowDefinition Height="*"/>     <!-- TreeView placeholder -->
+            <RowDefinition Height="Auto"/>  <!-- Separator -->
+            <RowDefinition Height="Auto"/>  <!-- Actions + Status -->
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: Input Mode -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <RadioButton Content="Block Mode" Foreground="{StaticResource TextPrimaryBrush}"
+                         IsChecked="{Binding IsBlockMode}" GroupName="InputMode"
+                         FontFamily="Segoe UI" FontSize="12" Margin="0,0,16,0"/>
+            <RadioButton Content="Entity Mode" Foreground="{StaticResource TextPrimaryBrush}"
+                         IsChecked="{Binding IsEntityMode}" GroupName="InputMode"
+                         FontFamily="Segoe UI" FontSize="12"/>
+        </StackPanel>
+
+        <!-- Row 1: Select Panel Button -->
+        <Button Grid.Row="1" Content="SELECT PANEL" Style="{StaticResource DarkButton}"
+                HorizontalAlignment="Stretch" Margin="0,0,0,8"
+                Click="SelectPanel_Click"/>
+
+        <!-- Row 2: Panel Info + Unit -->
+        <Grid Grid.Row="2" Margin="0,0,0,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource DarkLabel}" Text="Panel: "/>
+                <TextBlock Style="{StaticResource DarkLabel}" Text="{Binding PanelName}" FontWeight="Bold"/>
+                <TextBlock Style="{StaticResource DarkLabel}" Text="    Side: " Margin="12,0,0,0"/>
+                <TextBlock Style="{StaticResource DarkLabel}" Text="{Binding PanelSideText}" FontWeight="Bold"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource DarkLabel}" Text="Unit:" FontSize="10" VerticalAlignment="Center"/>
+                <ComboBox ItemsSource="{Binding UnitOptions}" SelectedItem="{Binding DisplayUnit}"
+                          Background="#FF3C3C3C" Foreground="Black" BorderBrush="#FF555555"
+                          FontSize="10" Width="50" Margin="4,0,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Row 3: Default Parameters -->
+        <Border Grid.Row="3" Background="#FF353535" CornerRadius="4" Padding="8,6" Margin="0,0,0,4">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Row 0: Web Height + Material -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource DarkLabel}" Text="Web H:" FontSize="10" Margin="0,0,4,4"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WebHeight, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#FF3C3C3C" Foreground="White" BorderBrush="#FF555555"
+                         FontFamily="Consolas" FontSize="10" Padding="2,1" Margin="0,0,4,4"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource DarkLabel}" Text="mm" FontSize="10" Margin="0,0,12,4"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Style="{StaticResource DarkLabel}" Text="Material:" FontSize="10" Margin="0,0,4,4"/>
+                <ComboBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2"
+                          ItemsSource="{Binding Materials}" SelectedItem="{Binding SelectedMaterial}"
+                          Background="#FF3C3C3C" Foreground="Black" BorderBrush="#FF555555"
+                          FontSize="10" Margin="0,0,0,4"/>
+
+                <!-- Row 1: Top Plate t + Flange t -->
+                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource DarkLabel}" Text="TP t:" FontSize="10" Margin="0,0,4,4"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding DefaultTopPlateThk, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#FF3C3C3C" Foreground="White" BorderBrush="#FF555555"
+                         FontFamily="Consolas" FontSize="10" Padding="2,1" Margin="0,0,4,4"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource DarkLabel}" Text="mm" FontSize="10" Margin="0,0,12,4"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Style="{StaticResource DarkLabel}" Text="FL t:" FontSize="10" Margin="0,0,4,4"/>
+                <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding DefaultFlangeThk, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#FF3C3C3C" Foreground="White" BorderBrush="#FF555555"
+                         FontFamily="Consolas" FontSize="10" Padding="2,1" Margin="0,0,4,4"/>
+                <TextBlock Grid.Row="1" Grid.Column="5" Style="{StaticResource DarkLabel}" Text="mm" FontSize="10" Margin="0,0,0,4"/>
+
+                <!-- Row 2: Stiffener + BS profile -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource DarkLabel}" Text="Stiff:" FontSize="10" Margin="0,0,4,4"/>
+                <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                          ItemsSource="{Binding ProfileOptions}" SelectedItem="{Binding DefaultStiffProfile}"
+                          Background="#FF3C3C3C" Foreground="Black" BorderBrush="#FF555555"
+                          FontSize="10" Margin="0,0,12,4"/>
+                <TextBlock Grid.Row="2" Grid.Column="3" Style="{StaticResource DarkLabel}" Text="BS:" FontSize="10" Margin="0,0,4,4"/>
+                <ComboBox Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2"
+                          ItemsSource="{Binding ProfileOptions}" SelectedItem="{Binding DefaultBSProfile}"
+                          Background="#FF3C3C3C" Foreground="Black" BorderBrush="#FF555555"
+                          FontSize="10" Margin="0,0,0,4"/>
+
+                <!-- Row 3: Outer throw direction radios -->
+                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource DarkLabel}" Text="OutStf:" FontSize="10" Margin="0,0,4,0"/>
+                <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,12,0">
+                    <RadioButton GroupName="OuterStf" Content="Out" FontSize="10"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 IsChecked="{Binding OuterStiffOutward, Mode=TwoWay}"
+                                 VerticalAlignment="Center"
+                                 ToolTip="Outer stiffener throws OUTWARD (away from panel centroid)"/>
+                    <RadioButton GroupName="OuterStf" Content="In" FontSize="10" Margin="8,0,0,0"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 IsChecked="{Binding OuterStiffInward, Mode=TwoWay}"
+                                 VerticalAlignment="Center"
+                                 ToolTip="Outer stiffener throws INWARD (toward panel centroid)"/>
+                </StackPanel>
+                <TextBlock Grid.Row="3" Grid.Column="3" Style="{StaticResource DarkLabel}" Text="OutWb:" FontSize="10" Margin="0,0,4,0"/>
+                <StackPanel Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,0">
+                    <RadioButton GroupName="OuterWb" Content="Out" FontSize="10"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 IsChecked="{Binding OuterWebOutward, Mode=TwoWay}"
+                                 VerticalAlignment="Center"
+                                 ToolTip="Outer web/beam throws OUTWARD (bracket inherits)"/>
+                    <RadioButton GroupName="OuterWb" Content="In" FontSize="10" Margin="8,0,0,0"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 IsChecked="{Binding OuterWebInward, Mode=TwoWay}"
+                                 VerticalAlignment="Center"
+                                 ToolTip="Outer web/beam throws INWARD (bracket inherits)"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Row 4: Separator -->
+        <Separator Grid.Row="4" Background="{StaticResource BorderBrush}" Margin="0,4"/>
+
+        <!-- Row 5: Tree + Plannar Groups + Properties (3-split) -->
+        <Grid Grid.Row="5" Margin="0,4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*" MinHeight="80"/>    <!-- Tree -->
+                <RowDefinition Height="5"/>                     <!-- Splitter 1 -->
+                <RowDefinition Height="1*" MinHeight="60"/>    <!-- Plannar Groups DataGrid -->
+                <RowDefinition Height="5"/>                     <!-- Splitter 2 -->
+                <RowDefinition Height="1*" MinHeight="100"/>   <!-- Properties -->
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Tree toolbar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#FF3C3C3C" Height="24">
+                        <Button x:Name="BtnExpandAll" Content="⊞ Expand All" Background="Transparent"
+                                Foreground="#FFCCCCCC" BorderThickness="0" Padding="8,2" FontSize="10"
+                                Cursor="Hand" Click="ExpandAll_Click" ToolTip="Expand all nodes"/>
+                        <Button x:Name="BtnCollapseAll" Content="⊟ Collapse All" Background="Transparent"
+                                Foreground="#FFCCCCCC" BorderThickness="0" Padding="8,2" FontSize="10"
+                                Cursor="Hand" Click="CollapseAll_Click" ToolTip="Collapse to main level"/>
+                    </StackPanel>
+
+                    <ctrl:StructureTreeView Grid.Row="1" x:Name="TreeView" DataContext="{Binding TreeNodes}"/>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch"
+                          Background="{StaticResource BorderBrush}" Margin="0,2"
+                          ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
+                          Cursor="SizeNS"/>
+
+            <!-- Plannar Groups DataGrid -->
+            <Border Grid.Row="2" Background="#FF353535"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="4" Margin="0,2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Plannar Groups" Foreground="{StaticResource TextPrimaryBrush}"
+                               FontFamily="Segoe UI" FontSize="10" FontWeight="Bold" Margin="6,3"/>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding PlannarGroups}"
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              Background="#FF353535" Foreground="{StaticResource TextPrimaryBrush}"
+                              BorderThickness="0" FontFamily="Consolas" FontSize="10"
+                              HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="#FF555555" RowHeight="18"
+                              ColumnHeaderHeight="20">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#FF3C3C3C"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                <Setter Property="FontSize" Value="9"/>
+                                <Setter Property="Padding" Value="4,2"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="#FF353535"/>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Label}" Width="50"/>
+                            <DataGridTextColumn Header="Pos" Binding="{Binding Position, StringFormat=F0}" Width="60"/>
+                            <DataGridTextColumn Header="Members" Binding="{Binding MemberCount}" Width="50"/>
+                            <DataGridTextColumn Header="Throw" Binding="{Binding ThrowText}" Width="70"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch"
+                          Background="{StaticResource BorderBrush}" Margin="0,2"
+                          ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
+                          Cursor="SizeNS"/>
+
+            <Border Grid.Row="4" Background="#FF353535"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="4">
+                <ctrl:PropertiesPanel x:Name="PropsPanel"/>
+            </Border>
+        </Grid>
+
+        <!-- Row 6: Separator -->
+        <Separator Grid.Row="6" Background="{StaticResource BorderBrush}" Margin="0,4"/>
+
+        <!-- Row 7: Actions + Status -->
+        <Grid Grid.Row="7">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="iProperties" Background="#FF444444" Foreground="White"
+                    BorderThickness="0" Padding="8,6" FontFamily="Segoe UI" FontSize="11"
+                    Cursor="Hand" HorizontalAlignment="Left"
+                    Click="IProperties_Click"/>
+
+            <Button Grid.Column="1" x:Name="BtnShowDebug"
+                    BorderThickness="0" Padding="8,6" FontFamily="Segoe UI" FontSize="11"
+                    Cursor="Hand" Margin="6,0,0,0"
+                    Foreground="White"
+                    Click="ShowDebugSymbols_Click"
+                    ToolTip="Toggle debug symbols (ThrowThickness ...). Click lần 2 để ẩn.">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <!-- OFF state: xám neutral, text "Show Debug" -->
+                        <Setter Property="Background" Value="#FF555555"/>
+                        <Setter Property="Content" Value="Show Debug"/>
+                        <Style.Triggers>
+                            <!-- ON state: accent blue, text "Hide Debug" -->
+                            <DataTrigger Binding="{Binding DebugSymbolsShown}" Value="True">
+                                <Setter Property="Background" Value="#FF0078D4"/>
+                                <Setter Property="Content" Value="Hide Debug"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <Button Grid.Column="2" Content="Save DB" Background="#FF2E7D32" Foreground="White"
+                    BorderThickness="0" Padding="8,6" FontFamily="Segoe UI" FontSize="11"
+                    Cursor="Hand" Margin="6,0,0,0" HorizontalAlignment="Left"
+                    Click="SaveDB_Click"
+                    ToolTip="Save panel + elements xuống SQLite DB"/>
+
+            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource DarkLabel}" Text="Status: "
+                           Foreground="{StaticResource TextSecondaryBrush}"/>
+                <TextBlock Style="{StaticResource DarkLabel}" Text="{Binding StatusText}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

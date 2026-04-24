@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run:*)",
+      "Bash(find . -name \"*.cs\" -o -name \"*.xaml\" -o -name \"*.csproj\")",
+      "Bash(find . -name \"MCGCadPlugin_*.dll\" -path \"*/bin/Debug/*\")",
+      "Bash(ls -t bin/Debug/MCGCadPlugin_*.dll)",
+      "Bash(ls bin/Debug/)",
+      "Read(C:/Program Files/Autodesk/AutoCAD 2023/**)",
+      "Read(C:/CustomTools/**)",
+      "Write(C:/CustomTools/Temp/**)"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+    // .vscode/tasks.json
+    // Tích hợp build & launch vào VS Code
+    // Ctrl+Shift+B → chạy task mặc định (Build & Launch AutoCAD)
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // ── Task chính: Build + Copy + Mở AutoCAD ──
+            "label": "Build & Launch AutoCAD",
+            "type": "shell",
+            "command": "${workspaceFolder}\\build-and-launch.bat",
+            "group": {
+                "kind": "build",
+                "isDefault": true  // Ctrl+Shift+B sẽ chạy task này
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true,      // Xóa output cũ mỗi lần chạy
+                "focus": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            // ── Task phụ: Chỉ Build, không mở AutoCAD ──
+            "label": "Build Only",
+            "type": "shell",
+            "command": "dotnet build -c Debug --nologo",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            // ── Task phụ: Build Release ──
+            "label": "Build Release",
+            "type": "shell",
+            "command": "dotnet build -c Release --nologo",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

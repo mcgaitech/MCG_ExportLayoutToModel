@@ -1,0 +1,88 @@
+<UserControl x:Class="MCGCadPlugin.Views.DetailDesign.Controls.StructureTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MCGCadPlugin.Views.DetailDesign.ViewModels"
+             Background="Transparent">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <SolidColorBrush x:Key="TreeTextBrush" Color="#FFEEEEEE"/>
+        <SolidColorBrush x:Key="TreeHandleBrush" Color="#FF777777"/>
+        <SolidColorBrush x:Key="TreeValueBrush" Color="#FF4FC3F7"/>
+        <SolidColorBrush x:Key="TreeThrowBrush" Color="#FF66BB6A"/>
+        <SolidColorBrush x:Key="TreeStatusBrush" Color="#FFFF9800"/>
+        <SolidColorBrush x:Key="TreeSelectedBg" Color="#FF0078D4"/>
+
+        <!-- Inactive selection: nền tối thay vì trắng -->
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF404040"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFEEEEEE"/>
+
+        <HierarchicalDataTemplate DataType="{x:Type vm:ElementNodeViewModel}"
+                                  ItemsSource="{Binding Children}">
+            <StackPanel Orientation="Horizontal" Margin="1,1">
+                <!-- Icon -->
+                <TextBlock Text="{Binding Icon}" Foreground="{StaticResource TreeTextBrush}"
+                           FontFamily="Segoe UI" FontSize="11" Margin="0,0,3,0"
+                           VerticalAlignment="Center"/>
+
+                <!-- Part name -->
+                <TextBlock Text="{Binding DisplayName}" Foreground="{StaticResource TreeTextBrush}"
+                           FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold"
+                           VerticalAlignment="Center" MinWidth="50"/>
+
+                <!-- Value: thickness hoặc section (cyan) -->
+                <TextBlock Text="{Binding ValueText}" Foreground="{StaticResource TreeValueBrush}"
+                           FontFamily="Consolas" FontSize="10"
+                           VerticalAlignment="Center" Margin="6,0,0,0" MinWidth="70"/>
+
+                <!-- GUID (gray, short) -->
+                <TextBlock Text="{Binding ShortGuid}" Foreground="{StaticResource TreeHandleBrush}"
+                           FontFamily="Consolas" FontSize="9"
+                           VerticalAlignment="Center" Margin="6,0,0,0"/>
+
+                <!-- Status icon -->
+                <TextBlock Text="{Binding StatusIcon}" Foreground="{StaticResource TreeStatusBrush}"
+                           FontFamily="Segoe UI" FontSize="9" Margin="4,0,0,0"
+                           VerticalAlignment="Center"/>
+
+                <!-- Flip button: chỉ hiện cho flippable leaf nodes -->
+                <Button Content="⟲" FontSize="10" Padding="4,0" MinWidth="18"
+                        Background="Transparent" BorderThickness="0"
+                        Foreground="{StaticResource TreeTextBrush}" Cursor="Hand"
+                        Margin="6,0,0,0" VerticalAlignment="Center"
+                        Click="FlipButton_Click" Tag="{Binding}"
+                        Visibility="{Binding IsFlippable, Converter={StaticResource BoolToVis}}"
+                        ToolTip="Flip throw direction"/>
+
+                <StackPanel.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Find in drawing" Click="FindInDrawing_Click" Tag="{Binding}"/>
+                    </ContextMenu>
+                </StackPanel.ContextMenu>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </UserControl.Resources>
+
+    <TreeView x:Name="StructureTree"
+              Background="#FF2D2D2D" BorderThickness="0"
+              ItemsSource="{Binding}"
+              VirtualizingStackPanel.IsVirtualizing="True"
+              VirtualizingStackPanel.VirtualizationMode="Recycling"
+              SelectedItemChanged="StructureTree_SelectedItemChanged"
+              PreviewMouseDown="StructureTree_PreviewMouseDown">
+        <TreeView.ItemContainerStyle>
+            <Style TargetType="TreeViewItem">
+                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                <Setter Property="Foreground" Value="#FFEEEEEE"/>
+                <Setter Property="Padding" Value="1,0"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsMultiSelected}" Value="True">
+                        <Setter Property="Background" Value="#FF264F78"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </TreeView.ItemContainerStyle>
+    </TreeView>
+</UserControl>
